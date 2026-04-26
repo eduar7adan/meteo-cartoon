@@ -1,6 +1,6 @@
 import WeatherAnimation from './WeatherAnimation.jsx';
 
-export default function WeatherCard({ weather }) {
+export default function WeatherCard({ weather, onSaveFavorite }) {
   const formattedDate = new Intl.DateTimeFormat('es', {
     weekday: 'long',
     day: 'numeric',
@@ -33,6 +33,9 @@ export default function WeatherCard({ weather }) {
           <dd>{weather.wind} km/h</dd>
         </div>
       </dl>
+      <button type="button" className="favorite-button" onClick={() => onSaveFavorite(weather.favorite)}>
+        Guardar en favoritos
+      </button>
     </article>
   );
 }

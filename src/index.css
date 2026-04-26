@@ -72,6 +72,33 @@ input {
   padding: 24px 0;
 }
 
+.view-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.view-tabs button,
+.favorite-button,
+.favorites-list button {
+  border: 2px solid #171717;
+  background: #fffaf0;
+  color: #171717;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.view-tabs button {
+  min-height: 42px;
+  padding: 0 18px;
+  text-transform: uppercase;
+}
+
+.view-tabs button:disabled {
+  background: #171717;
+  color: #fffaf0;
+  cursor: default;
+}
+
 .search-box {
   border: 2px solid #171717;
   padding: 16px;
@@ -89,6 +116,10 @@ input {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 10px;
+}
+
+.search-input-wrap {
+  position: relative;
 }
 
 .search-row input,
@@ -122,9 +153,52 @@ input {
   opacity: 0.65;
 }
 
+.suggestions-list {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 2px solid #171717;
+  background: #fffaf0;
+  box-shadow: 4px 4px 0 #171717;
+}
+
+.suggestions-list button {
+  display: block;
+  width: 100%;
+  min-height: auto;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid #171717;
+  background: transparent;
+  color: #171717;
+  text-align: left;
+  text-transform: none;
+}
+
+.suggestions-list li:last-child button {
+  border-bottom: 0;
+}
+
+.suggestions-list button:hover {
+  background: #171717;
+  color: #fffaf0;
+}
+
+.suggestions-list span {
+  display: block;
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
 .weather-card,
 .state-panel,
-.intro-panel {
+.intro-panel,
+.favorites-panel {
   border: 3px double #171717;
   background: rgba(255, 255, 255, 0.3);
   box-shadow: 6px 6px 0 #171717;
@@ -197,6 +271,125 @@ input {
 
 .weather-details dd {
   margin: 0;
+}
+
+.favorite-button {
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 0 16px;
+  text-transform: uppercase;
+}
+
+.favorites-panel {
+  padding: 20px;
+}
+
+.favorites-panel h2 {
+  margin: 0 0 16px;
+  font-size: 2rem;
+}
+
+.favorites-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.favorites-list li {
+  display: grid;
+  grid-template-columns: 1fr 42px;
+  align-items: stretch;
+}
+
+.favorites-list button {
+  min-height: 48px;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.favorites-list .remove-favorite {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0;
+  border-left: 0;
+  text-align: center;
+}
+
+.remove-favorite svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.favorites-list button:hover,
+.favorite-button:hover,
+.view-tabs button:hover:not(:disabled) {
+  background: #171717;
+  color: #fffaf0;
+}
+
+.favorites-list span {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(244, 240, 232, 0.82);
+}
+
+.confirm-modal {
+  width: min(420px, 100%);
+  border: 3px double #171717;
+  background: #fffaf0;
+  box-shadow: 6px 6px 0 #171717;
+  padding: 22px;
+  text-align: center;
+}
+
+.confirm-modal h3 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+}
+
+.confirm-modal p {
+  margin: 0 0 18px;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.modal-actions button {
+  min-height: 44px;
+  border: 2px solid #171717;
+  background: #fffaf0;
+  color: #171717;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.modal-actions button:hover {
+  background: #171717;
+  color: #fffaf0;
 }
 
 .state-panel,
@@ -855,8 +1048,13 @@ input {
 
   .weather-card,
   .state-panel,
-  .intro-panel {
+  .intro-panel,
+  .favorites-panel {
     box-shadow: 4px 4px 0 #171717;
+  }
+
+  .favorites-list li {
+    grid-template-columns: 1fr 42px;
   }
 
   .weather-art {

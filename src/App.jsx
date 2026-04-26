@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
-import { searchWeatherByCity } from './api/weatherApi.js';
+import { searchWeatherByCity, searchWeatherByPlace } from './api/weatherApi.js';
+import Favorites from './components/Favorites.jsx';
 import Layout from './components/Layout.jsx';
 import Search from './components/Search.jsx';
 import WeatherCard from './components/WeatherCard.jsx';
+import { readFavorites, removeFavorite, saveFavorite } from './utils/favorites.js';
 
 const LAST_CITY_KEY = 'weather-app-last-city';
 
 export default function App() {
   const [weather, setWeather] = useState(null);
   const [lastCity, setLastCity] = useState('');
+  const [favorites, setFavorites] = useState([]);
+  const [view, setView] = useState('search');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    setFavorites(readFavorites());
     const savedCity = localStorage.getItem(LAST_CITY_KEY);
 
     if (savedCity) {
@@ -22,7 +27,8 @@ export default function App() {
   }, []);
 
   async function handleSearch(city) {
-    const cleanCity = city.trim();
+    const isPlace = typeof city === 'object';
+    const cleanCity = isPlace ? city.name : city.trim();
 
     if (!cleanCity) {
       setError('Escribe una ciudad para consultar el parte.');
@@ -34,9 +40,10 @@ export default function App() {
       setIsLoading(true);
       setError('');
 
-      const result = await searchWeatherByCity(cleanCity);
+      const result = isPlace ? await searchWeatherByPlace(city) : await searchWeatherByCity(cleanCity);
       setWeather(result);
       setLastCity(cleanCity);
+      setView('search');
       localStorage.setItem(LAST_CITY_KEY, cleanCity);
     } catch (err) {
       setWeather(null);
@@ -46,9 +53,28 @@ export default function App() {
     }
   }
 
+  function handleSaveFavorite(favorite) {
+    setFavorites(saveFavorite(favorite));
+  }
+
+  function handleRemoveFavorite(favorite) {
+    setFavorites(removeFavorite(favorite));
+  }
+
   return (
     <Layout>
-      <Search onSearch={handleSearch} isLoading={isLoading} initialCity={lastCity} />
+      <nav className="view-tabs">
+        <button type="button" onClick={() => setView('search')} disabled={view === 'search'}>
+          Buscar
+        </button>
+        <button type="button" onClick={() => setView('favorites')} disabled={view === 'favorites'}>
+          Favoritos
+        </button>
+      </nav>
+
+      {view === 'search' && (
+        <Search onSearch={handleSearch} isLoading={isLoading} initialCity={lastCity} />
+      )}
 
       {isLoading && (
         <section className="state-panel loading-panel" aria-live="polite">
@@ -63,13 +89,19 @@ export default function App() {
         </section>
       )}
 
-      {!isLoading && !error && weather && <WeatherCard weather={weather} />}
+      {!isLoading && !error && view === 'search' && weather && (
+        <WeatherCard weather={weather} onSaveFavorite={handleSaveFavorite} />
+      )}
 
-      {!isLoading && !error && !weather && (
+      {!isLoading && !error && view === 'search' && !weather && (
         <section className="intro-panel">
           <h2>El cielo, en portada</h2>
           <p>Busca una ciudad para ver su tiempo actual con una pequena ilustracion animada.</p>
         </section>
+      )}
+
+      {!isLoading && !error && view === 'favorites' && (
+        <Favorites favorites={favorites} onSelect={handleSearch} onRemove={handleRemoveFavorite} />
       )}
     </Layout>
   );

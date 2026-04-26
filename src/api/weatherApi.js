@@ -5,10 +5,20 @@ const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 
 export async function searchWeatherByCity(city) {
   const place = await findCity(city);
-  const weather = await getCurrentWeather(place.latitude, place.longitude);
+  return searchWeatherByPlace(place);
+}
 
+export async function searchWeatherByPlace(place) {
+  const weather = await getCurrentWeather(place.latitude, place.longitude);
   return {
     city: formatCityName(place),
+    favorite: {
+      name: place.name,
+      country: place.country,
+      admin1: place.admin1,
+      latitude: place.latitude,
+      longitude: place.longitude,
+    },
     date: weather.time,
     temperature: Math.round(weather.temperature_2m),
     humidity: weather.relative_humidity_2m,
@@ -16,6 +26,31 @@ export async function searchWeatherByCity(city) {
     description: getWeatherDescription(weather.weather_code),
     type: getWeatherType(weather.weather_code),
   };
+}
+
+export async function searchCitySuggestions(query) {
+  const url = new URL(GEOCODING_URL);
+  url.searchParams.set('name', query.trim());
+  url.searchParams.set('count', '10');
+  url.searchParams.set('language', 'es');
+  url.searchParams.set('format', 'json');
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('No se pudieron buscar sugerencias.');
+  }
+
+  const data = await response.json();
+
+  return (data.results || []).map((place) => ({
+    id: place.id,
+    name: place.name,
+    country: place.country,
+    admin1: place.admin1,
+    latitude: place.latitude,
+    longitude: place.longitude,
+  }));
 }
 
 async function findCity(city) {
