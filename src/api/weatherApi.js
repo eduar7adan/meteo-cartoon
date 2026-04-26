@@ -9,7 +9,9 @@ export async function searchWeatherByCity(city) {
 }
 
 export async function searchWeatherByPlace(place) {
-  const weather = await getCurrentWeather(place.latitude, place.longitude);
+  const data = await getWeather(place.latitude, place.longitude);
+  const weather = data.current;
+
   return {
     city: formatCityName(place),
     favorite: {
@@ -25,6 +27,7 @@ export async function searchWeatherByPlace(place) {
     wind: Math.round(weather.wind_speed_10m),
     description: getWeatherDescription(weather.weather_code),
     type: getWeatherType(weather.weather_code),
+    forecast: formatForecast(data.daily),
   };
 }
 
@@ -75,11 +78,13 @@ async function findCity(city) {
   return data.results[0];
 }
 
-async function getCurrentWeather(latitude, longitude) {
+async function getWeather(latitude, longitude) {
   const url = new URL(FORECAST_URL);
   url.searchParams.set('latitude', latitude);
   url.searchParams.set('longitude', longitude);
   url.searchParams.set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m');
+  url.searchParams.set('daily', 'weather_code');
+  url.searchParams.set('forecast_days', '8');
   url.searchParams.set('timezone', 'auto');
 
   const response = await fetch(url);
@@ -94,9 +99,30 @@ async function getCurrentWeather(latitude, longitude) {
     throw new Error('La respuesta del tiempo no contiene datos actuales.');
   }
 
-  return data.current;
+  return data;
 }
 
 function formatCityName(place) {
   return [place.name, place.admin1, place.country].filter(Boolean).join(', ');
+}
+
+function formatForecast(daily) {
+  if (!daily?.time || !daily?.weather_code) return [];
+
+  return daily.time.slice(1, 8).map((date, index) => {
+    const weatherCode = daily.weather_code[index + 1];
+
+    return {
+      date,
+      weatherCode,
+      weekdayInitial: getWeekdayInitial(date),
+      weatherType: getWeatherType(weatherCode),
+      description: getWeatherDescription(weatherCode),
+    };
+  });
+}
+
+function getWeekdayInitial(date) {
+  const initials = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+  return initials[new Date(`${date}T12:00:00`).getDay()];
 }

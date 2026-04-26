@@ -12,12 +12,12 @@ function normalizeWeatherType(value) {
   return 'cloudy';
 }
 
-export default function WeatherAnimation({ type }) {
+export default function WeatherAnimation({ type, compact = false }) {
   const weatherType = normalizeWeatherType(type);
 
   return (
     <section
-      className={`weather-art weather-art--${weatherType}`}
+      className={`weather-art weather-art--${weatherType}${compact ? ' weather-art--compact' : ''}`}
       aria-label={`Animacion del tiempo: ${weatherType}`}
     >
       <div className="weather-art__stage">

@@ -31,6 +31,29 @@ export default function CityDetail({ weather }) {
           </div>
         </dl>
       </article>
+      {weather.forecast?.length > 0 && (
+        <section className="forecast-section" aria-label="Prevision de los proximos 7 dias">
+          <h3>Próximos 7 días</h3>
+          <div className="forecast-grid">
+            {weather.forecast.map((day) => (
+              <article className="forecast-day" key={day.date} title={day.description}>
+                <ForecastIcon type={day.weatherType} />
+                <strong>{day.weekdayInitial}</strong>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </section>
+  );
+}
+
+function ForecastIcon({ type }) {
+  return (
+    <span className={`forecast-icon forecast-icon--${type}`} aria-hidden="true">
+      <span className="forecast-sun" />
+      <span className="forecast-cloud" />
+      <span className="forecast-mark" />
+    </span>
   );
 }
