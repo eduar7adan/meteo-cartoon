@@ -79,7 +79,8 @@ input {
 
 .view-tabs button,
 .favorite-button,
-.favorites-list button {
+.favorites-list button,
+.detail-back {
   border: 2px solid #171717;
   background: #fffaf0;
   color: #171717;
@@ -278,6 +279,135 @@ input {
   margin-top: 16px;
   padding: 0 16px;
   text-transform: uppercase;
+}
+
+.city-detail {
+  display: grid;
+  gap: 0;
+}
+
+.city-detail-card {
+  position: relative;
+  overflow: hidden;
+  border: 3px double #171717;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 6px 6px 0 #171717;
+  padding: 16px;
+}
+
+.city-detail-header {
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px solid #171717;
+  padding-bottom: 8px;
+}
+
+.city-detail-header h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 8vw, 4.2rem);
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+
+.city-detail-header p {
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+.city-detail-main {
+  position: relative;
+  z-index: 1;
+  min-height: 180px;
+  padding: 10px 0;
+}
+
+.city-detail-summary {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  padding: 4px 10px 6px 0;
+  background: rgba(244, 240, 232, 0.82);
+}
+
+.city-detail-summary .temperature {
+  margin: 0;
+  font-size: clamp(3.5rem, 14vw, 6rem);
+}
+
+.city-detail .weather-art {
+  position: absolute;
+  right: -16px;
+  bottom: -22px;
+  z-index: 1;
+  width: 230px;
+  min-height: 190px;
+  opacity: 0.48;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.city-detail .weather-art__stage {
+  width: 210px;
+  overflow: visible;
+}
+
+.city-detail .wa-sun-orbit {
+  width: 112px;
+  height: 112px;
+}
+
+.city-detail .wa-sun-core {
+  width: 58px;
+  height: 58px;
+}
+
+.city-detail .wa-sun-core span {
+  inset: 12px;
+}
+
+.city-detail .wa-ray {
+  --ray-gap: 78px;
+  --ray-len: 20px;
+}
+
+.city-detail .wa-ray--long {
+  --ray-len: 24px;
+}
+
+.city-detail .wa-ray--medium {
+  --ray-len: 18px;
+}
+
+.city-detail .wa-ray--short {
+  --ray-len: 14px;
+}
+
+.city-detail-metrics {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 2px solid #171717;
+}
+
+.city-detail-metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid #171717;
+}
+
+.city-detail-metrics dt {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.city-detail-metrics dd {
+  margin: 0;
 }
 
 .favorites-panel {
@@ -1055,6 +1185,36 @@ input {
 
   .favorites-list li {
     grid-template-columns: 1fr 42px;
+  }
+
+  .city-detail-card {
+    box-shadow: 4px 4px 0 #171717;
+    padding: 14px;
+  }
+
+  .city-detail-main {
+    min-height: 185px;
+    padding: 8px 0;
+  }
+
+  .city-detail .weather-art {
+    right: -46px;
+    bottom: -34px;
+    width: 240px;
+    min-height: 200px;
+    opacity: 0.42;
+  }
+
+  .city-detail .weather-art__stage {
+    width: 220px;
+  }
+
+  .city-detail .wa-ray {
+    --ray-gap: 68px;
+  }
+
+  .city-detail-metrics {
+    grid-template-columns: 1fr;
   }
 
   .weather-art {

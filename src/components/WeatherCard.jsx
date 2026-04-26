@@ -33,9 +33,11 @@ export default function WeatherCard({ weather, onSaveFavorite }) {
           <dd>{weather.wind} km/h</dd>
         </div>
       </dl>
-      <button type="button" className="favorite-button" onClick={() => onSaveFavorite(weather.favorite)}>
-        Guardar en favoritos
-      </button>
+      {onSaveFavorite && (
+        <button type="button" className="favorite-button" onClick={() => onSaveFavorite(weather.favorite)}>
+          Guardar en favoritos
+        </button>
+      )}
     </article>
   );
 }

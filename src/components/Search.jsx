@@ -96,7 +96,7 @@ export default function Search({ onSearch, isLoading, initialCity = '' }) {
     setCity(suggestion.name);
     setIsFocused(false);
     setSuggestions([]);
-    onSearch(suggestion);
+    onSearch(suggestion.name);
   }
 
   return (

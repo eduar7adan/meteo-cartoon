@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { searchWeatherByCity, searchWeatherByPlace } from './api/weatherApi.js';
+import CityDetail from './components/CityDetail.jsx';
 import Favorites from './components/Favorites.jsx';
 import Layout from './components/Layout.jsx';
 import Search from './components/Search.jsx';
@@ -27,8 +28,7 @@ export default function App() {
   }, []);
 
   async function handleSearch(city) {
-    const isPlace = typeof city === 'object';
-    const cleanCity = isPlace ? city.name : city.trim();
+    const cleanCity = city.trim();
 
     if (!cleanCity) {
       setError('Escribe una ciudad para consultar el parte.');
@@ -40,11 +40,27 @@ export default function App() {
       setIsLoading(true);
       setError('');
 
-      const result = isPlace ? await searchWeatherByPlace(city) : await searchWeatherByCity(cleanCity);
+      const result = await searchWeatherByCity(cleanCity);
       setWeather(result);
       setLastCity(cleanCity);
       setView('search');
       localStorage.setItem(LAST_CITY_KEY, cleanCity);
+    } catch (err) {
+      setWeather(null);
+      setError(err.message || 'Ha ocurrido un error al consultar el tiempo.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleFavoriteSelect(favorite) {
+    try {
+      setIsLoading(true);
+      setError('');
+
+      const result = await searchWeatherByPlace(favorite);
+      setWeather(result);
+      setView('cityDetail');
     } catch (err) {
       setWeather(null);
       setError(err.message || 'Ha ocurrido un error al consultar el tiempo.');
@@ -101,7 +117,15 @@ export default function App() {
       )}
 
       {!isLoading && !error && view === 'favorites' && (
-        <Favorites favorites={favorites} onSelect={handleSearch} onRemove={handleRemoveFavorite} />
+        <Favorites favorites={favorites} onSelect={handleFavoriteSelect} onRemove={handleRemoveFavorite} />
+      )}
+
+      {!isLoading && !error && view === 'cityDetail' && weather && (
+        <CityDetail
+          weather={weather}
+          onBackToFavorites={() => setView('favorites')}
+          onSearchAnother={() => setView('search')}
+        />
       )}
     </Layout>
   );
