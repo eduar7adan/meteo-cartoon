@@ -1,4 +1,4 @@
-import { getWeatherDescription, getWeatherType } from '../utils/weatherCodes.js';
+import { getWeatherDescriptionFromCode, getWeatherTypeFromCode } from '../utils/weatherCodes.js';
 
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
@@ -25,8 +25,10 @@ export async function searchWeatherByPlace(place) {
     temperature: Math.round(weather.temperature_2m),
     humidity: weather.relative_humidity_2m,
     wind: Math.round(weather.wind_speed_10m),
-    description: getWeatherDescription(weather.weather_code),
-    type: getWeatherType(weather.weather_code),
+    minTemperature: roundTemperature(data.daily?.temperature_2m_min?.[0]),
+    maxTemperature: roundTemperature(data.daily?.temperature_2m_max?.[0]),
+    description: getWeatherDescriptionFromCode(weather.weather_code),
+    type: getWeatherTypeFromCode(weather.weather_code),
     forecast: formatForecast(data.daily),
   };
 }
@@ -56,6 +58,11 @@ export async function searchCitySuggestions(query) {
   }));
 }
 
+export async function getCurrentWeatherType(place) {
+  const data = await getWeather(place.latitude, place.longitude);
+  return getWeatherTypeFromCode(data.current?.weather_code);
+}
+
 async function findCity(city) {
   const url = new URL(GEOCODING_URL);
   url.searchParams.set('name', city.trim());
@@ -83,7 +90,7 @@ async function getWeather(latitude, longitude) {
   url.searchParams.set('latitude', latitude);
   url.searchParams.set('longitude', longitude);
   url.searchParams.set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m');
-  url.searchParams.set('daily', 'weather_code');
+  url.searchParams.set('daily', 'weather_code,temperature_2m_min,temperature_2m_max');
   url.searchParams.set('forecast_days', '8');
   url.searchParams.set('timezone', 'auto');
 
@@ -116,8 +123,8 @@ function formatForecast(daily) {
       date,
       weatherCode,
       weekdayInitial: getWeekdayInitial(date),
-      weatherType: getWeatherType(weatherCode),
-      description: getWeatherDescription(weatherCode),
+      weatherType: getWeatherTypeFromCode(weatherCode),
+      description: getWeatherDescriptionFromCode(weatherCode),
     };
   });
 }
@@ -125,4 +132,8 @@ function formatForecast(daily) {
 function getWeekdayInitial(date) {
   const initials = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
   return initials[new Date(`${date}T12:00:00`).getDay()];
+}
+
+function roundTemperature(value) {
+  return Number.isFinite(value) ? Math.round(value) : null;
 }

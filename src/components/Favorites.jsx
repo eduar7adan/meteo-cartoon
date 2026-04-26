@@ -1,7 +1,36 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getCurrentWeatherType } from '../api/weatherApi.js';
+import WeatherMiniIcon from './WeatherMiniIcon.jsx';
 
 export default function Favorites({ favorites, onSelect, onRemove }) {
   const [favoriteToRemove, setFavoriteToRemove] = useState(null);
+  const [weatherTypes, setWeatherTypes] = useState({});
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadWeatherTypes() {
+      const entries = await Promise.all(
+        favorites.map(async (favorite) => {
+          const key = getFavoriteKey(favorite);
+
+          try {
+            return [key, await getCurrentWeatherType(favorite)];
+          } catch {
+            return [key, 'cloudy'];
+          }
+        }),
+      );
+
+      if (!ignore) setWeatherTypes(Object.fromEntries(entries));
+    }
+
+    loadWeatherTypes();
+
+    return () => {
+      ignore = true;
+    };
+  }, [favorites]);
 
   function handleRemoveClick(event, favorite) {
     event.stopPropagation();
@@ -28,9 +57,18 @@ export default function Favorites({ favorites, onSelect, onRemove }) {
       <ul className="favorites-list">
         {favorites.map((favorite) => (
           <li key={`${favorite.latitude}-${favorite.longitude}`}>
-            <button type="button" onClick={() => onSelect(favorite)}>
-              <strong>{favorite.name}</strong>
-              <span>{[favorite.admin1, favorite.country].filter(Boolean).join(', ')}</span>
+            <button type="button" className="favorite-main" onClick={() => onSelect(favorite)}>
+              <span>
+                <strong>{favorite.name}</strong>
+                <span>{[favorite.admin1, favorite.country].filter(Boolean).join(', ')}</span>
+              </span>
+              <span className="favorite-weather">
+                {weatherTypes[getFavoriteKey(favorite)] ? (
+                  <WeatherMiniIcon type={weatherTypes[getFavoriteKey(favorite)]} />
+                ) : (
+                  <span className="favorite-weather-placeholder" />
+                )}
+              </span>
             </button>
             <button
               type="button"
@@ -69,4 +107,8 @@ export default function Favorites({ favorites, onSelect, onRemove }) {
       )}
     </section>
   );
+}
+
+function getFavoriteKey(favorite) {
+  return `${favorite.latitude}-${favorite.longitude}`;
 }

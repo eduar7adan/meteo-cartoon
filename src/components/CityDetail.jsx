@@ -1,7 +1,15 @@
 import WeatherAnimation from './WeatherAnimation.jsx';
+import WeatherMiniIcon from './WeatherMiniIcon.jsx';
 
 export default function CityDetail({ weather }) {
   const subtitle = [weather.favorite?.admin1, weather.favorite?.country].filter(Boolean).join(', ');
+  const minTemperature = Number.isFinite(weather.minTemperature) ? weather.minTemperature : '--';
+  const maxTemperature = Number.isFinite(weather.maxTemperature) ? weather.maxTemperature : '--';
+  const rangePosition = getRangePosition(
+    weather.temperature,
+    weather.minTemperature,
+    weather.maxTemperature,
+  );
 
   return (
     <section className="city-detail">
@@ -29,6 +37,11 @@ export default function CityDetail({ weather }) {
             <dt>Viento</dt>
             <dd>{weather.wind} km/h</dd>
           </div>
+          <div className="temperature-range">
+            <span>MIN {minTemperature}&deg;C</span>
+            <i style={{ '--range-position': `${rangePosition}%` }} />
+            <span>MAX {maxTemperature}&deg;C</span>
+          </div>
         </dl>
       </article>
       {weather.forecast?.length > 0 && (
@@ -37,7 +50,7 @@ export default function CityDetail({ weather }) {
           <div className="forecast-grid">
             {weather.forecast.map((day) => (
               <article className="forecast-day" key={day.date} title={day.description}>
-                <ForecastIcon type={day.weatherType} />
+                <WeatherMiniIcon type={day.weatherType} />
                 <strong>{day.weekdayInitial}</strong>
               </article>
             ))}
@@ -48,12 +61,10 @@ export default function CityDetail({ weather }) {
   );
 }
 
-function ForecastIcon({ type }) {
-  return (
-    <span className={`forecast-icon forecast-icon--${type}`} aria-hidden="true">
-      <span className="forecast-sun" />
-      <span className="forecast-cloud" />
-      <span className="forecast-mark" />
-    </span>
-  );
+function getRangePosition(current, min, max) {
+  if (!Number.isFinite(current) || !Number.isFinite(min) || !Number.isFinite(max) || min === max) {
+    return 50;
+  }
+
+  return Math.min(100, Math.max(0, ((current - min) / (max - min)) * 100));
 }

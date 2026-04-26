@@ -326,7 +326,6 @@ input {
   z-index: 2;
   display: inline-block;
   padding: 4px 10px 6px 0;
-  background: rgba(244, 240, 232, 0.82);
 }
 
 .city-detail-summary .temperature {
@@ -386,10 +385,10 @@ input {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
   margin: 0;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 2px solid #171717;
 }
 
@@ -397,7 +396,7 @@ input {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  padding: 8px;
+  padding: 6px 8px;
   border: 1px solid #171717;
 }
 
@@ -408,6 +407,32 @@ input {
 
 .city-detail-metrics dd {
   margin: 0;
+}
+
+.city-detail-metrics .temperature-range {
+  align-items: center;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.temperature-range i {
+  position: relative;
+  flex: 1;
+  min-width: 12px;
+  border-top: 1px solid #171717;
+}
+
+.temperature-range i::after {
+  content: '';
+  position: absolute;
+  left: var(--range-position, 50%);
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #171717;
+  border-radius: 50%;
+  background: #fffaf0;
+  transform: translate(-50%, -50%);
 }
 
 .forecast-section {
@@ -470,6 +495,7 @@ input {
   height: 20px;
   border: 1.5px solid #171717;
   border-radius: 50%;
+  animation: forecastSunPulse 2.8s ease-in-out infinite;
 }
 
 .forecast-sun::before {
@@ -479,6 +505,7 @@ input {
   border: 1.5px dashed #171717;
   border-radius: 50%;
   opacity: 0.55;
+  animation: forecastSunSpin 9s linear infinite;
 }
 
 .forecast-cloud {
@@ -488,6 +515,7 @@ input {
   border: 1.5px solid #171717;
   border-radius: 999px;
   background: #fffaf0;
+  animation: forecastCloudDrift 3.4s ease-in-out infinite;
 }
 
 .forecast-cloud::before,
@@ -557,6 +585,7 @@ input {
   width: 22px;
   height: 9px;
   background: repeating-linear-gradient(90deg, #171717 0 1.5px, transparent 1.5px 7px);
+  animation: forecastRainFall 0.9s linear infinite;
 }
 
 .forecast-icon--storm .forecast-mark {
@@ -565,6 +594,7 @@ input {
   height: 15px;
   background: #171717;
   clip-path: polygon(45% 0, 100% 0, 60% 40%, 100% 40%, 22% 100%, 42% 55%, 0 55%);
+  animation: forecastStormFlash 1.2s steps(2, end) infinite;
 }
 
 .forecast-icon--snow .forecast-mark {
@@ -573,12 +603,47 @@ input {
   height: 9px;
   background:
     radial-gradient(circle, #171717 2px, transparent 3px) 0 0 / 8px 8px;
+  animation: forecastSnowFall 1.8s ease-in-out infinite;
 }
 
 .forecast-icon--fog .forecast-mark {
   width: 34px;
   height: 16px;
   background: repeating-linear-gradient(0deg, transparent 0 5px, #171717 5px 6.5px);
+  animation: forecastFogMove 2.4s ease-in-out infinite;
+}
+
+@keyframes forecastSunPulse {
+  50% { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes forecastSunSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes forecastCloudDrift {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-58%, -54%); }
+}
+
+@keyframes forecastRainFall {
+  0% { transform: translate(-50%, -70%); opacity: 0.25; }
+  45% { opacity: 1; }
+  100% { transform: translate(-50%, -25%); opacity: 0.25; }
+}
+
+@keyframes forecastStormFlash {
+  50% { opacity: 0.25; }
+}
+
+@keyframes forecastSnowFall {
+  0%, 100% { transform: translate(-50%, -62%); opacity: 0.45; }
+  50% { transform: translate(-50%, -30%); opacity: 1; }
+}
+
+@keyframes forecastFogMove {
+  0%, 100% { transform: translate(-54%, -50%); opacity: 0.55; }
+  50% { transform: translate(-46%, -50%); opacity: 1; }
 }
 
 .favorites-panel {
@@ -610,6 +675,17 @@ input {
   text-align: left;
 }
 
+.favorites-list .favorite-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.favorites-list .favorite-main > span:first-child {
+  min-width: 0;
+}
+
 .favorites-list .remove-favorite {
   display: grid;
   place-items: center;
@@ -617,6 +693,25 @@ input {
   padding: 0;
   border-left: 0;
   text-align: center;
+}
+
+.favorite-weather {
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.favorite-weather .forecast-icon {
+  width: 38px;
+  height: 38px;
+}
+
+.favorite-weather-placeholder {
+  width: 18px;
+  height: 18px;
+  border: 1px dashed #171717;
+  border-radius: 50%;
 }
 
 .remove-favorite svg {
@@ -1355,7 +1450,16 @@ input {
   }
 
   .favorites-list li {
-    grid-template-columns: 1fr 42px;
+    grid-template-columns: 1fr 38px;
+  }
+
+  .favorite-weather {
+    flex-basis: 34px;
+  }
+
+  .favorite-weather .forecast-icon {
+    width: 34px;
+    height: 34px;
   }
 
   .city-detail-card {
