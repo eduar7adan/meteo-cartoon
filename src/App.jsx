@@ -5,10 +5,12 @@ import Favorites from './components/Favorites.jsx';
 import Layout from './components/Layout.jsx';
 import Search from './components/Search.jsx';
 import WeatherCard from './components/WeatherCard.jsx';
+import WeatherMap from './components/WeatherMap.jsx';
 import { readFavorites, removeFavorite, saveFavorite } from './utils/favorites.js';
 
 const LAST_CITY_KEY = 'weather-app-last-city';
 const PAGE_TURN_DURATION = 1040;
+const VIEW_ORDER = ['search', 'favorites', 'map', 'cityDetail'];
 
 export default function App() {
   const [weather, setWeather] = useState(null);
@@ -101,7 +103,8 @@ export default function App() {
   function handleViewChange(nextView) {
     if (nextView === view) return;
 
-    const direction = view === 'search' && nextView === 'favorites' ? 'forward' : 'back';
+    const direction =
+      VIEW_ORDER.indexOf(nextView) > VIEW_ORDER.indexOf(view) ? 'forward' : 'back';
     startPageTurn(direction);
     setView(nextView);
   }
@@ -114,6 +117,9 @@ export default function App() {
         </button>
         <button type="button" onClick={() => handleViewChange('favorites')} disabled={view === 'favorites'}>
           Favoritos
+        </button>
+        <button type="button" onClick={() => handleViewChange('map')} disabled={view === 'map'}>
+          Mapa
         </button>
       </nav>
 
@@ -148,6 +154,8 @@ export default function App() {
       {!isLoading && !error && view === 'favorites' && (
         <Favorites favorites={favorites} onSelect={handleFavoriteSelect} onRemove={handleRemoveFavorite} />
       )}
+
+      {!isLoading && !error && view === 'map' && <WeatherMap />}
 
       {!isLoading && !error && view === 'cityDetail' && weather && (
         <CityDetail

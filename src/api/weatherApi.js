@@ -78,6 +78,22 @@ export async function getCurrentWeatherSummary(place) {
   return summary;
 }
 
+export async function getCurrentWeatherSummaries(places) {
+  const summaries = await Promise.allSettled(
+    places.map(async (place) => {
+      const data = await getWeather(place.latitude, place.longitude);
+      return {
+        ...place,
+        weather: formatCurrentWeatherSummary(data),
+      };
+    }),
+  );
+
+  return summaries
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => result.value);
+}
+
 async function findCity(city) {
   const url = new URL(GEOCODING_URL);
   url.searchParams.set('name', city.trim());
