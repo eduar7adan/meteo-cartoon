@@ -72,6 +72,13 @@ input {
   padding: 24px 0;
 }
 
+.app-credit {
+  margin: 0;
+  text-align: center;
+  font-size: 0.72rem;
+  font-style: italic;
+}
+
 .view-tabs {
   display: flex;
   flex-wrap: nowrap;

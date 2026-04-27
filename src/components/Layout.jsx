@@ -8,6 +8,7 @@ export default function Layout({ children }) {
 
       <main className="content">{children}</main>
 
+      <p className="app-credit">APP desarrollada por Eduardo A.R.</p>
     </div>
   );
 }
