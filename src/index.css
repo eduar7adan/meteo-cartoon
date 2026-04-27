@@ -509,7 +509,6 @@ input {
 }
 
 .forecast-cloud {
-  display: none;
   width: 30px;
   height: 14px;
   border: 1.5px solid #171717;
@@ -548,36 +547,13 @@ input {
   height: 17px;
 }
 
-.forecast-icon--partly-cloudy .forecast-cloud,
-.forecast-icon--cloudy .forecast-cloud,
-.forecast-icon--rain .forecast-cloud,
-.forecast-icon--storm .forecast-cloud,
-.forecast-icon--snow .forecast-cloud {
-  display: block;
-}
-
 .forecast-icon--partly-cloudy .forecast-cloud {
   left: 57%;
   top: 58%;
 }
 
-.forecast-icon--cloudy .forecast-sun,
-.forecast-icon--rain .forecast-sun,
-.forecast-icon--storm .forecast-sun,
-.forecast-icon--snow .forecast-sun,
-.forecast-icon--fog .forecast-sun {
-  display: none;
-}
-
 .forecast-icon--cloudy .forecast-cloud::after {
   box-shadow: -12px 5px 0 -4px #fffaf0;
-}
-
-.forecast-icon--rain .forecast-mark,
-.forecast-icon--snow .forecast-mark,
-.forecast-icon--storm .forecast-mark,
-.forecast-icon--fog .forecast-mark {
-  display: block;
 }
 
 .forecast-icon--rain .forecast-mark {

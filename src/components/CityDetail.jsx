@@ -11,6 +11,14 @@ export default function CityDetail({ weather }) {
     weather.maxTemperature,
   );
 
+  console.log('DEBUG WEATHER - detail animation', {
+    city: weather.favorite?.name || weather.city,
+    weatherCode: weather.weatherCode,
+    weatherType: weather.type,
+    description: weather.description,
+    type: weather.type,
+  });
+
   return (
     <section className="city-detail">
       <article className="city-detail-card">

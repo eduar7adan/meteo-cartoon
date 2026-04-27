@@ -1,31 +1,31 @@
 import { useEffect, useState } from 'react';
-import { getCurrentWeatherType } from '../api/weatherApi.js';
+import { getCurrentWeatherSummary } from '../api/weatherApi.js';
 import WeatherMiniIcon from './WeatherMiniIcon.jsx';
 
 export default function Favorites({ favorites, onSelect, onRemove }) {
   const [favoriteToRemove, setFavoriteToRemove] = useState(null);
-  const [weatherTypes, setWeatherTypes] = useState({});
+  const [weatherSummaries, setWeatherSummaries] = useState({});
 
   useEffect(() => {
     let ignore = false;
 
-    async function loadWeatherTypes() {
+    async function loadWeatherSummaries() {
       const entries = await Promise.all(
         favorites.map(async (favorite) => {
           const key = getFavoriteKey(favorite);
 
           try {
-            return [key, await getCurrentWeatherType(favorite)];
+            return [key, await getCurrentWeatherSummary(favorite)];
           } catch {
-            return [key, 'cloudy'];
+            return [key, { weatherType: 'cloudy' }];
           }
         }),
       );
 
-      if (!ignore) setWeatherTypes(Object.fromEntries(entries));
+      if (!ignore) setWeatherSummaries(Object.fromEntries(entries));
     }
 
-    loadWeatherTypes();
+    loadWeatherSummaries();
 
     return () => {
       ignore = true;
@@ -63,8 +63,21 @@ export default function Favorites({ favorites, onSelect, onRemove }) {
                 <span>{[favorite.admin1, favorite.country].filter(Boolean).join(', ')}</span>
               </span>
               <span className="favorite-weather">
-                {weatherTypes[getFavoriteKey(favorite)] ? (
-                  <WeatherMiniIcon type={weatherTypes[getFavoriteKey(favorite)]} />
+                {weatherSummaries[getFavoriteKey(favorite)] ? (
+                  (() => {
+                    const favoriteKey = getFavoriteKey(favorite);
+                    const weatherSummary = weatherSummaries[favoriteKey];
+                    const type = weatherSummary.weatherType;
+
+                    console.log('DEBUG WEATHER - favorite mini', {
+                      favoriteKey,
+                      city: favorite.name,
+                      weatherSummary,
+                      type,
+                    });
+
+                    return <WeatherMiniIcon type={type} />;
+                  })()
                 ) : (
                   <span className="favorite-weather-placeholder" />
                 )}

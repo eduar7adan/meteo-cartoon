@@ -1,4 +1,5 @@
 import { getWeatherDescriptionFromCode, getWeatherTypeFromCode } from '../utils/weatherCodes.js';
+import { normalizeWeatherType } from '../utils/weatherTypes.js';
 
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
@@ -10,7 +11,7 @@ export async function searchWeatherByCity(city) {
 
 export async function searchWeatherByPlace(place) {
   const data = await getWeather(place.latitude, place.longitude);
-  const weather = data.current;
+  const summary = formatCurrentWeatherSummary(data);
 
   return {
     city: formatCityName(place),
@@ -21,14 +22,14 @@ export async function searchWeatherByPlace(place) {
       latitude: place.latitude,
       longitude: place.longitude,
     },
-    date: weather.time,
-    temperature: Math.round(weather.temperature_2m),
-    humidity: weather.relative_humidity_2m,
-    wind: Math.round(weather.wind_speed_10m),
-    minTemperature: roundTemperature(data.daily?.temperature_2m_min?.[0]),
-    maxTemperature: roundTemperature(data.daily?.temperature_2m_max?.[0]),
-    description: getWeatherDescriptionFromCode(weather.weather_code),
-    type: getWeatherTypeFromCode(weather.weather_code),
+    date: summary.date,
+    temperature: summary.temperature,
+    humidity: summary.humidity,
+    wind: summary.windSpeed,
+    minTemperature: summary.minTemp,
+    maxTemperature: summary.maxTemp,
+    description: summary.description,
+    type: summary.weatherType,
     forecast: formatForecast(data.daily),
   };
 }
@@ -58,9 +59,23 @@ export async function searchCitySuggestions(query) {
   }));
 }
 
-export async function getCurrentWeatherType(place) {
+export async function getCurrentWeatherSummary(place) {
   const data = await getWeather(place.latitude, place.longitude);
-  return getWeatherTypeFromCode(data.current?.weather_code);
+  const summary = formatCurrentWeatherSummary(data);
+
+  console.log('DEBUG WEATHER - api summary', {
+    city: place.name,
+    coordinates: {
+      latitude: place.latitude,
+      longitude: place.longitude,
+    },
+    weatherCode: summary.weatherCode,
+    weatherType: summary.weatherType,
+    description: summary.description,
+    temperature: summary.temperature,
+  });
+
+  return summary;
 }
 
 async function findCity(city) {
@@ -111,6 +126,23 @@ async function getWeather(latitude, longitude) {
 
 function formatCityName(place) {
   return [place.name, place.admin1, place.country].filter(Boolean).join(', ');
+}
+
+function formatCurrentWeatherSummary(data) {
+  const weather = data.current;
+  const weatherCode = weather.weather_code;
+
+  return {
+    date: weather.time,
+    weatherCode,
+    weatherType: normalizeWeatherType(getWeatherTypeFromCode(weatherCode)),
+    description: getWeatherDescriptionFromCode(weatherCode),
+    temperature: Math.round(weather.temperature_2m),
+    humidity: weather.relative_humidity_2m,
+    windSpeed: Math.round(weather.wind_speed_10m),
+    minTemp: roundTemperature(data.daily?.temperature_2m_min?.[0]),
+    maxTemp: roundTemperature(data.daily?.temperature_2m_max?.[0]),
+  };
 }
 
 function formatForecast(daily) {
