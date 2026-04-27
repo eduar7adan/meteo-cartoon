@@ -117,11 +117,12 @@ function RainIcon() {
       <div className="wa-cloud-layer wa-cloud-layer--rain">
         <CloudShape />
       </div>
-      <div className="wa-drop wa-drop--big wa-d1" />
-      <div className="wa-drop wa-drop--small wa-d2" />
-      <div className="wa-drop wa-drop--medium wa-d3" />
-      <div className="wa-drop wa-drop--big wa-d4" />
-      <div className="wa-drop wa-drop--small wa-d5" />
+      <div className="wa-drop wa-drop--fine wa-d1" />
+      <div className="wa-drop wa-drop--soft wa-d2" />
+      <div className="wa-drop wa-drop--fine wa-d3" />
+      <div className="wa-drop wa-drop--slender wa-d4" />
+      <div className="wa-drop wa-drop--soft wa-d5" />
+      <div className="wa-drop wa-drop--slender wa-d6" />
     </div>
   );
 }

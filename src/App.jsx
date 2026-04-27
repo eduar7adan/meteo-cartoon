@@ -8,6 +8,7 @@ import WeatherCard from './components/WeatherCard.jsx';
 import { readFavorites, removeFavorite, saveFavorite } from './utils/favorites.js';
 
 const LAST_CITY_KEY = 'weather-app-last-city';
+const PAGE_TURN_DURATION = 1040;
 
 export default function App() {
   const [weather, setWeather] = useState(null);
@@ -16,6 +17,7 @@ export default function App() {
   const [view, setView] = useState('search');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pageTurnDirection, setPageTurnDirection] = useState('');
 
   useEffect(() => {
     setFavorites(readFavorites());
@@ -57,6 +59,7 @@ export default function App() {
     try {
       setIsLoading(true);
       setError('');
+      startPageTurn('forward');
 
       const result = await searchWeatherByPlace(favorite);
       setWeather(result);
@@ -69,21 +72,47 @@ export default function App() {
     }
   }
 
-  function handleSaveFavorite(favorite) {
-    setFavorites(saveFavorite(favorite));
+  async function handleSaveFavorite(favorite) {
+    try {
+      setIsLoading(true);
+      setError('');
+      startPageTurn('forward');
+      setFavorites(saveFavorite(favorite));
+
+      const result = await searchWeatherByPlace(favorite);
+      setWeather(result);
+      setView('cityDetail');
+    } catch (err) {
+      setError(err.message || 'Ha ocurrido un error al consultar el tiempo.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function handleRemoveFavorite(favorite) {
     setFavorites(removeFavorite(favorite));
   }
 
+  function startPageTurn(direction) {
+    setPageTurnDirection(direction);
+    setTimeout(() => setPageTurnDirection(''), PAGE_TURN_DURATION);
+  }
+
+  function handleViewChange(nextView) {
+    if (nextView === view) return;
+
+    const direction = view === 'search' && nextView === 'favorites' ? 'forward' : 'back';
+    startPageTurn(direction);
+    setView(nextView);
+  }
+
   return (
     <Layout>
       <nav className="view-tabs">
-        <button type="button" onClick={() => setView('search')} disabled={view === 'search'}>
+        <button type="button" onClick={() => handleViewChange('search')} disabled={view === 'search'}>
           Buscar
         </button>
-        <button type="button" onClick={() => setView('favorites')} disabled={view === 'favorites'}>
+        <button type="button" onClick={() => handleViewChange('favorites')} disabled={view === 'favorites'}>
           Favoritos
         </button>
       </nav>
@@ -126,6 +155,10 @@ export default function App() {
           onBackToFavorites={() => setView('favorites')}
           onSearchAnother={() => setView('search')}
         />
+      )}
+
+      {pageTurnDirection && (
+        <div className={`page-turn page-turn--${pageTurnDirection}`} aria-hidden="true" />
       )}
     </Layout>
   );

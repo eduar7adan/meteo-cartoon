@@ -117,6 +117,12 @@ export default function Search({ onSearch, isLoading, initialCity = '' }) {
             placeholder="Madrid, Buenos Aires, Londres..."
             disabled={isLoading}
           />
+          <button type="submit" className="search-submit" disabled={isLoading} aria-label="Buscar ciudad">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m15.5 15.5 5 5" />
+            </svg>
+          </button>
           {suggestions.length > 0 && (
             <ul className="suggestions-list">
               {suggestions.map((suggestion) => (
@@ -132,9 +138,6 @@ export default function Search({ onSearch, isLoading, initialCity = '' }) {
             </ul>
           )}
         </div>
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Consultando...' : 'Buscar'}
-        </button>
       </div>
     </form>
   );
